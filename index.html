@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171329"><title>Bestie Arcade</title>
+<style>
+:root{color-scheme:dark;--bg:#100e1b;--panel:#1b1830;--panel2:#26213f;--ink:#f7f3ff;--muted:#b7afce;--pink:#ff79c6;--purple:#a78bfa;--cyan:#67e8f9;--line:#393253;--good:#86efac;--bad:#fda4af}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#29204a 0,#100e1b 58%);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:11px 14px;border-radius:13px}button:hover{border-color:var(--purple)}button:disabled{opacity:.42;cursor:not-allowed}input{width:100%;background:#100e1b;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.wrap{max-width:1050px;margin:auto;padding:18px 14px 48px}.hero{text-align:center;padding:22px 0}.logo{font-size:clamp(2rem,7vw,3.4rem);font-weight:950;letter-spacing:-.05em;margin:0}.logo span{color:var(--pink)}.sub,.muted{color:var(--muted)}.sub{margin:5px 0 0}.pill{display:inline-block;border:1px solid #554878;background:#2b2346;border-radius:999px;padding:5px 10px;font-size:.78rem;color:#e9ddff;margin-bottom:10px}
+.panel{background:rgba(27,24,48,.94);border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 14px 40px #0002}.panel h2{margin:0 0 12px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.fit{flex:0 0 auto}.small{font-size:.88rem}.status{padding:10px 12px;border-radius:12px;background:#17142a;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}.good{color:var(--good)}.bad{color:var(--bad)}
+.layout{display:grid;grid-template-columns:1fr;gap:12px}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:9px}.gamecard{text-align:left;min-height:108px;padding:12px;background:linear-gradient(145deg,#26203f,#1a172c)}.gamecard .emoji{font-size:1.55rem;display:block;margin-bottom:4px}.gamecard strong{display:block;font-size:.95rem}.gamecard small{display:block;color:var(--muted);margin-top:4px}.gamecard.active{border-color:var(--pink);box-shadow:0 0 0 1px var(--pink) inset}
+.hidden{display:none!important}.gamehead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.gamehead h2{margin:0}.board{display:grid;gap:6px;max-width:430px;margin:16px auto}.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(1.1rem,5vw,2rem);font-weight:800;padding:0;border-radius:10px;min-width:0}.tac{grid-template-columns:repeat(3,1fr)}.connect{grid-template-columns:repeat(7,1fr);gap:4px;background:#40347a;padding:7px;border-radius:15px}.connect .cell{border-radius:50%;background:#17142a;font-size:1rem}.dots{grid-template-columns:repeat(5,1fr);gap:2px}.dots .cell{aspect-ratio:1.15;background:#17142a;padding:0;font-size:1rem}.gomoku{grid-template-columns:repeat(9,1fr);gap:3px}.gomoku .cell{font-size:1rem;padding:0}.reversi{grid-template-columns:repeat(8,1fr);gap:3px;background:#166534;padding:5px;border-radius:10px}.reversi .cell{font-size:clamp(.7rem,3.7vw,1.3rem);background:#15803d;padding:0}.memory{grid-template-columns:repeat(4,1fr)}.memory .cell{font-size:clamp(1.2rem,6vw,2rem)}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}.actions button{flex:0 1 auto}.choice{min-width:95px;min-height:75px;font-size:1.05rem}.choice .big{display:block;font-size:1.8rem}.footer{text-align:center;color:var(--muted);font-size:.82rem;margin-top:22px}
+@media(min-width:720px){.layout{grid-template-columns:1fr 1fr}.hero{padding-top:30px}}
+</style>
+</head>
+<body><div class="wrap">
+<header class="hero"><div class="pill">✦ NO ADS • NO ACCOUNTS • PHONE FRIENDLY</div><h1 class="logo">BESTIE <span>ARCADE</span> 🎮</h1><p class="sub">A tiny private arcade for two friends.</p></header>
+<div class="layout">
+<section class="panel"><h2>👋 Make a private room</h2><label class="small muted">Your nickname</label><input id="name" maxlength="18" value="Player 1" placeholder="Nickname"><label class="small muted" style="display:block;margin-top:10px">Room password (share separately)</label><input id="pass" maxlength="40" type="password" placeholder="Choose a room password"><div class="row" style="margin-top:10px"><button id="hostBtn">✨ Create room</button><button id="joinToggle" class="fit">Join room</button></div><div id="joinBox" class="hidden" style="margin-top:10px"><label class="small muted">Friend's invite link or Peer ID</label><input id="peerId" placeholder="Paste invite link or ID"><button id="joinBtn" style="margin-top:8px;width:100%">Join friend's room</button></div><div id="status" class="status">Create a room, then send your friend the invite link and password separately.</div></section>
+<section class="panel"><h2>🔐 Your invite</h2><div class="muted small">Room / peer ID</div><div id="myId" style="font-size:1.15rem;font-weight:850;overflow-wrap:anywhere;margin:5px 0 10px">Not connected</div><button id="copyBtn" disabled>Copy invite link</button><div id="people" class="status">No friend connected yet.</div><p class="muted small">Privacy shield: only someone with the invite ID and password can join through this page. Don't share the password publicly.</p></section>
+</div>
+<section class="panel"><div class="gamehead"><h2>🕹️ Pick one of 33 games</h2><span class="pill" id="roomTag">ROOM NOT READY</span></div><div id="games" class="games"></div></section>
+<section class="panel"><div class="gamehead"><h2 id="gameTitle">Choose a game</h2><button id="reset" class="fit" disabled>↻ New round</button></div><div id="desc" class="muted small">Both players should join before starting.</div><div id="gameStatus" class="status">Waiting for a room…</div><div id="gameArea"></div></section>
+<div class="footer">No advertising, analytics, or tracking scripts are included. Game moves are sent peer-to-peer after the connection is established.<br>PeerJS's public signalling service is used to connect browsers. It is a hobby project, so availability isn't guaranteed.</div>
+</div>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const games=[
+['ttt','Tic-Tac-Toe','❎','Get three in a row.','board'],['connect','Connect Four','🔴','Connect four discs.','board'],['dots','Dots & Boxes','🔷','Complete the most squares.','board'],['gomoku','Gomoku','⚫','Get five in a row.','board'],['reversi','Reversi','⚪','Flip your opponent’s discs.','board'],['rps','Rock Paper Scissors','✂️','Choose secretly, reveal together.','duel'],['memory','Memory Match','🧠','Find pairs and score points.','board'],['nim','Take the Stones','🪨','Take 1–3 stones; avoid being last.','duel'],['reaction','Reaction Duel','⚡','Race to tap first after GO.','duel'],['guess','Number Duel','🔢','Guess the secret number.','duel'],
+['coin','Coin Flip','🪙','Call heads or tails.','duel'],['higher','Higher or Lower','📈','Guess whether the next number is higher.','duel'],['odd','Odd or Even','🎲','Guess whether the roll is odd or even.','duel'],['hangman','Hangman','🔤','Guess the hidden word.','duel'],['wordchain','Word Chain','🔗','Enter a word starting with the last letter.','duel'],['quickmath','Quick Math','➗','Answer a quick arithmetic question.','duel'],['colormatch','Color Match','🎨','Pick the named colour, not the word colour.','duel'],['emoji','Emoji Guess','😺','Guess the emoji shown by your friend.','duel'],['rpsls','Rock Paper Scissors Lizard Spock','🖖','Five-choice rock-paper-scissors.','duel'],['dice','Dice Duel','🎲','Roll a die; highest wins the round.','duel'],['miniquiz','Mini Quiz','❓','Answer quick general-knowledge questions.','duel'],['truefalse','True or False','✅','Decide whether a fact is true.','duel'],['secretword','Secret Word','🗝️','Guess a short secret word.','duel'],['basketball','Basketball Shootout','🏀','Pick a shot and defend the hoop.','duel'],['penalty','Penalty Shootout','⚽','Choose a corner to shoot.','duel'],['pong','Pong Duel','🏓','Choose a side and try to outscore.','duel'],['airhockey','Air Hockey Duel','🏒','Aim left, middle, or right.','duel'],['quicktap','Quick Tap','👆','Tap as quickly as you can.','duel'],['highercard','Higher Card','🃏','Draw a card; highest wins.','duel'],['battleship','Battleship Guess','🚢','Guess your opponent’s hidden number.','duel'],['mastermind','Code Breaker','🧩','Crack a short colour code.','duel'],['reactioncolor','Color Reflex','🌈','Match the target colour.','duel'],['numberrace','Number Race','🏁','Race to reach the target number.','duel']
+];
+let peer=null,conn=null,host=false,myId='',friendName='',myName='Player',roomPass='',state=null,active='ttt',player=0,connected=false,challengeWord='',hostTimer=null;
+function say(msg,type=''){ $('status').textContent=msg;$('status').className='status '+type }
+function gameSay(msg,type=''){ $('gameStatus').textContent=msg;$('gameStatus').className='status '+type }
+function rand(n){return Math.floor(Math.random()*n)}
+function fresh(id){return {id,turn:0,winner:null,board:id==='ttt'?Array(9).fill(''):id==='connect'?Array(42).fill(''):id==='gomoku'?Array(81).fill(''):id==='reversi'?(()=>{let b=Array(64).fill('');b[27]='O';b[28]='X';b[35]='X';b[36]='O';return b})():null,h:Array(20).fill(false),v:Array(20).fill(false),boxes:Array(16).fill(-1),scores:[0,0],stones:15,picks:[null,null],cards:['🐱','🐶','🐸','🦊','🐼','🐵','🐙','🐰','🐱','🐶','🐸','🦊','🐼','🐵','🐙','🐰'].sort(()=>Math.random()-.5),revealed:[],matched:[],secret:rand(20)+1,guesses:[],round:0,choices:[null,null],word:['APPLE','GHOST','MANGO','TIGER','CLOUD','BRAIN','PEACH'][rand(7)],used:[],target:rand(9)+2,nums:[rand(10)+1,rand(10)+1],phase:'ready',winner:null,log:[],created:Date.now()}}
+function send(obj){if(conn&&conn.open)conn.send(obj)}
+function updateState(s){state=s;send({type:'state',state});render()}
+function renderGames(){const el=$('games');el.innerHTML='';games.forEach(g=>{const b=document.createElement('button');b.className='gamecard'+(active===g[0]?' active':'');b.innerHTML=`<span class="emoji">${g[2]}</span><strong>${g[1]}</strong><small>${g[3]}</small>`;b.onclick=()=>pickGame(g[0]);el.appendChild(b)})}
+function setConnected(name){connected=true;friendName=name||'Friend';$('roomTag').textContent='● TWO PLAYERS';$('people').textContent=`You: ${myName} · Friend: ${friendName}`;$('reset').disabled=false;say('Connected! Choose a game and start playing.','good');renderGames()}
+function newPeer(){return new Peer(undefined,{host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0})}
+function roomPassword(){return $('pass').value}
+function initHost(){
+ if(peer){peer.destroy()}host=true;myName=($('name').value.trim()||'Player 1').slice(0,18);roomPass=roomPassword();if(roomPass.length<4){say('Choose a room password of at least 4 characters.','bad');return}
+ say('Connecting to the free peer signalling service…');peer=newPeer();
+ peer.on('open',id=>{myId=id;$('myId').textContent=id;$('copyBtn').disabled=false;state=fresh(active);$('people').textContent='Waiting for your friend…';$('roomTag').textContent='● WAITING';say('Room created. Copy the invite and send the password separately.','good');});
+ peer.on('connection',c=>{if(conn&&conn.open){c.close();return}conn=c;bindConnection(c,true)});
+ peer.on('error',e=>say('Connection issue: '+e.type+'. Try again or create a new room.','bad'));
+}
+function bindConnection(c,isHost){
+ c.on('open',()=>{if(isHost){c.send({type:'password-check',name:myName,roomPass});}else{c.send({type:'hello',name:myName,roomPass});}});
+ c.on('data',m=>{
+  if(m.type==='hello'&&isHost){player=0;if(m.roomPass!==roomPass){c.send({type:'denied'});c.close();say('Wrong room password. Your friend should check it.','bad');return}conn=c;c.send({type:'welcome',name:myName,state});setConnected(m.name);return}
+  if(m.type==='password-check'&&!isHost){c.send({type:'hello',name:myName,roomPass:roomPassword()});return}
+  if(m.type==='denied'){say('Access denied: the room password is incorrect.','bad');c.close();return}
+  if(m.type==='welcome'&&!isHost){player=1;state=m.state;setConnected(m.name);render();return}
+  if(m.type==='state'){state=m.state;render();return}
+  if(m.type==='restart'){state=fresh(active);render();if(host)send({type:'state',state});return}
+  if(m.type==='game'){active=m.id;state=m.state;renderGames();render();return}
+  if(m.type==='leave'){say('Your friend disconnected.','bad');connected=false;$('roomTag').textContent='● FRIEND LEFT';}
+ });
+ c.on('close',()=>{if(conn===c){conn=null;connected=false;$('roomTag').textContent='● DISCONNECTED';$('people').textContent='Friend disconnected.';say('Connection closed. Share a fresh invite if needed.','bad')}});
+ c.on('error',()=>say('Peer connection error. Try reconnecting.','bad'));
+}
+function parsePeer(raw){try{const u=new URL(raw);return u.searchParams.get('peer')||u.searchParams.get('room')||raw.trim()}catch{return raw.trim()}}
+function joinRoom(){
+ const id=parsePeer($('peerId').value);myName=($('name').value.trim()||'Player 2').slice(0,18);if(!id){say('Paste your friend’s invite link or Peer ID.','bad');return}
+ if(peer)peer.destroy();say('Connecting to your friend…');peer=newPeer();peer.on('open',()=>{conn=peer.connect(id,{reliable:true});bindConnection(conn,false)});peer.on('error',e=>say('Could not connect: '+e.type+'. Check the invite and try again.','bad'));
+}
+function invite(){const u=new URL(location.href);u.searchParams.set('peer',myId);return u.href}
+$('hostBtn').onclick=initHost;$('joinToggle').onclick=()=>$('joinBox').classList.toggle('hidden');$('joinBtn').onclick=joinRoom;
+$('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(invite());say('Invite link copied! Send the room password in a separate message.','good')}catch{say('Copy this invite: '+invite(),'good')}};
+function pickGame(id){if(!connected){say('Create a room and wait for your friend to connect first.','bad');return}active=id;state=fresh(id);send({type:'game',id,state});renderGames();render()}
+$('reset').onclick=()=>{if(!connected)return;state=fresh(active);send({type:'game',id:active,state});render()};
+function btn(text,fn,disabled=false,cls=''){const b=document.createElement('button');b.textContent=text;b.className=cls;b.disabled=disabled;b.onclick=fn;return b}
+function board(cls){const b=document.createElement('div');b.className='board '+cls;$('gameArea').appendChild(b);return b}
+function isTurn(){return state&&state.turn===player&&connected}
+function ended(){return state.winner!==null&&state.winner!==undefined}
+function finishTurn(){send({type:'state',state});render()}
+function winLine(b,h,w,k,m){for(let r=0;r<h;r++)for(let c=0;c<w;c++){if(c+k<=w&&Array.from({length:k},(_,i)=>b[r*w+c+i]).every(x=>x===m))return true;if(r+k<=h&&Array.from({length:k},(_,i)=>b[(r+i)*w+c]).every(x=>x===m))return true;if(r+k<=h&&c+k<=w&&Array.from({length:k},(_,i)=>b[(r+i)*w+c+i]).every(x=>x===m))return true;if(r+k<=h&&c-k+1>=0&&Array.from({length:k},(_,i)=>b[(r+i)*w+c-i]).every(x=>x===m))return true}return false}
+function markWinner(msg){gameSay(msg,'good')}
+function playCell(i){
+ if(!isTurn()||ended())return;const s=state,mark=player===0?'X':'O';
+ if(active==='ttt'){if(s.board[i])return;s.board[i]=mark;if(winLine(s.board,3,3,3,mark))s.winner=player;else if(s.board.every(Boolean))s.winner='draw';else s.turn=1-player}
+ if(active==='connect'){const col=i%7;let t=-1;for(let r=5;r>=0;r--)if(!s.board[r*7+col]){t=r*7+col;break}if(t<0)return;s.board[t]=mark;if(winLine(s.board,6,7,4,mark))s.winner=player;else if(s.board.every(Boolean))s.winner='draw';else s.turn=1-player}
+ if(active==='gomoku'){if(s.board[i])return;s.board[i]=mark;if(winLine(s.board,9,9,5,mark))s.winner=player;else s.turn=1-player}
+ if(active==='reversi'){if(s.board[i])return;const opp=player===0?'O':'X',r=Math.floor(i/8),c=i%8,dirs=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]],flips=[];for(const [dr,dc] of dirs){let y=r+dr,x=c+dc,line=[];while(y>=0&&y<8&&x>=0&&x<8&&s.board[y*8+x]===opp){line.push(y*8+x);y+=dr;x+=dc}if(line.length&&y>=0&&y<8&&x>=0&&x<8&&s.board[y*8+x]===mark)flips.push(...line)}if(!flips.length)return;s.board[i]=mark;flips.forEach(j=>s.board[j]=mark);s.turn=1-player;if(s.board.every(Boolean)){const a=s.board.filter(x=>x==='X').length,b=s.board.filter(x=>x==='O').length;s.winner=a===b?'draw':a>b?0:1}}
+ finishTurn()
+}
+function drawDots(){
+ const s=state,b=board('dots');for(let r=0;r<9;r++)for(let c=0;c<9;c++){if(r%2===0&&c%2===0){const d=document.createElement('div');d.textContent='•';d.style.textAlign='center';d.style.fontSize='1.8rem';b.appendChild(d)}else if(r%2===0||c%2===0){const horiz=r%2===0,rr=Math.floor(r/2),cc=Math.floor(c/2),idx=horiz?rr*4+Math.floor((c-1)/2):Math.floor((r-1)/2)*5+cc,valid=horiz?cc<4&&rr<5:rr<4&&cc<5,arr=horiz?s.h:s.v;const x=btn(valid&&arr[idx]?(horiz?'━━':'┃'):(horiz?'──':'│'),()=>{if(!isTurn()||ended()||arr[idx])return;arr[idx]=true;let got=0;for(let y=0;y<4;y++)for(let x=0;x<4;x++){const k=y*4+x;if(s.boxes[k]!==-1)continue;if(s.h[y*4+x]&&s.h[(y+1)*4+x]&&s.v[y*5+x]&&s.v[y*5+x+1]){s.boxes[k]=player;s.scores[player]++;got++}}if(!got)s.turn=1-player;if(s.boxes.every(x=>x!==-1))s.winner=s.scores[0]===s.scores[1]?'draw':s.scores[0]>s.scores[1]?0:1;finishTurn()},!valid||!isTurn()||ended()||arr[idx]);x.style.padding='0';x.style.borderRadius='3px';b.appendChild(x)}else{const k=Math.floor((r-1)/2)*4+Math.floor((c-1)/2),d=document.createElement('div');d.style.cssText='display:flex;align-items:center;justify-content:center;font-size:.8rem;background:#282341;border-radius:4px';d.textContent=s.boxes[k]===0?'✕':s.boxes[k]===1?'○':'';b.appendChild(d)}}gameSay(`You ${s.scores[player]} · Friend ${s.scores[1-player]} · ${isTurn()?'Your line':'Friend’s line'}`)
+}
+const duelChoices={
+ coin:[['Heads','Tails'],['🪙','🪙']],higher:[['Higher','Lower'],['⬆️','⬇️']],odd:[['Odd','Even'],['1️⃣','2️⃣']],
+ rpsls:[['Rock','Paper','Scissors','Lizard','Spock'],['🪨','📄','✂️','🦎','🖖']],dice:[['Roll die'],['🎲']],quicktap:[['Tap!'],['👆']],
+ basketball:[['Left','Center','Right'],['⬅️','🏀','➡️']],penalty:[['Left','Center','Right'],['⬅️','⚽','➡️']],pong:[['Left','Middle','Right'],['⬅️','🏓','➡️']],airhockey:[['Left','Middle','Right'],['⬅️','🏒','➡️']],
+ highercard:[['Draw card'],['🃏']],battleship:[['1','2','3','4','5','6'],['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣']],reactioncolor:[['Pink','Blue','Green','Purple'],['🩷','💙','💚','💜']],numberrace:[['+1','+2','+3'],['1️⃣','2️⃣','3️⃣']]
+};
+function genericMove(choice){
+ if(!isTurn()||ended())return;const s=state;
+ if(active==='rps'||active==='rpsls'){
+  s.choices[player]=Number(choice);
+  if(s.choices[1-player]===null){s.turn=1-player;finishTurn();return}
+  const a=s.choices[0],b=s.choices[1];
+  if(a===b)s.winner='draw';
+  else if(active==='rps'){s.winner=((a-b+3)%3===1)?0:1;}
+  else {const beats={0:[2,3],1:[0,4],2:[1,3],3:[1,4],4:[0,2]};s.winner=beats[a].includes(b)?0:1;}
+  finishTurn();return;
+ }
+ if(active==='coin'){const pick=Number(choice),outcome=rand(2);s.log=[`Coin: ${outcome?'Tails':'Heads'}`];s.winner=pick===outcome?player:1-player;finishTurn();return}
+ if(active==='higher'){const next=rand(13)+1;s.log=[`Number: ${s.target} → ${next}`];s.winner=(choice==='Higher'&&next>s.target)||(choice==='Lower'&&next<s.target)?player:'draw';s.target=next;finishTurn();return}
+ if(active==='odd'){const outcome=rand(6)+1;s.log=[`Die roll: ${outcome}`];s.winner=(choice===(outcome%2?'Odd':'Even'))?player:1-player;finishTurn();return}
+ if(active==='dice'||active==='highercard'){const roll=rand(active==='dice'?6:13)+1;s.log=[`Player ${player+1} rolled ${roll}`];s.scores[player]+=roll;s.round++;if(s.round>=2)s.winner=s.scores[0]===s.scores[1]?'draw':s.scores[0]>s.scores[1]?0:1;else s.turn=1-player;finishTurn();return}
+ if(active==='numberrace'){s.scores[player]+=Number(choice);if(s.scores[player]>=10)s.winner=player;else s.turn=1-player;finishTurn();return}
+ if(active==='battleship'){const guess=Number(choice);const hit=guess===s.secret%6+1;s.log=[hit?'💥 Hit!':'🌊 Miss!'];if(hit)s.winner=player;else{s.turn=1-player;s.secret=rand(6)+1}finishTurn();return}
+ if(active==='reactioncolor'){const target=rand(4);s.log=[`Target colour: ${['Pink','Blue','Green','Purple'][target]}`];s.winner=Number(choice)===target?player:1-player;finishTurn();return}
+ if(active==='quicktap'){s.winner=player;finishTurn();return}
+ if(['basketball','penalty','pong','airhockey'].includes(active)){const target=rand(3),scored=Number(choice)===target;s.scores[player]+=scored?1:0;s.log=[scored?'Point!':'Saved!'];s.turn=1-player;s.round++;if(s.round>=6)s.winner=s.scores[0]===s.scores[1]?'draw':s.scores[0]>s.scores[1]?0:1;finishTurn();return}
+ s.turn=1-player;finishTurn();
+}
+function renderDuel(){
+ const area=$('gameArea');const choices=duelChoices[active];if(choices){const box=document.createElement('div');box.className='actions';choices[0].forEach((txt,i)=>{const b=document.createElement('button');b.className='choice';b.innerHTML=`<span class="big">${choices[1][i]||'🎯'}</span>${txt}`;b.disabled=!isTurn()||ended();b.onclick=()=>genericMove(active==='dice'||active==='highercard'?String(rand(6)+1):active==='numberrace'?String(i+1):active==='battleship'?txt:active==='coin'?(i===0?0:1):active==='higher'?txt:active==='odd'?txt:active==='reactioncolor'?String(i):String(i));box.appendChild(b)});area.appendChild(box)}
+ else {
+ const prompt=document.createElement('div');prompt.className='panel';prompt.style.textAlign='center';prompt.innerHTML=`<div style="font-size:2rem">${({hangman:'🔤',wordchain:'🔗',quickmath:'➗',colormatch:'🎨',emoji:'😺',miniquiz:'❓',truefalse:'✅',secretword:'🗝️',mastermind:'🧩'}[active]||'🎯')}</div><p>${({hangman:'Guess a letter in the secret word.',wordchain:'Enter a word; try to start with the last letter of the previous word.',quickmath:`Solve: ${state.nums[0]} + ${state.nums[1]} = ?`,colormatch:'Choose the target colour.',emoji:'Guess which emoji your friend picked.',miniquiz:'What is the largest planet in our solar system?',truefalse:'True or false: the Sun is a star.',secretword:'Guess a word (type one below).',mastermind:'Guess the secret code number 1–4.'}[active]||'Make your move!')}</p>`;const inp=document.createElement('input');inp.placeholder='Your answer';const submit=btn('Submit answer',()=>{if(!inp.value.trim())return;const v=inp.value.trim().toLowerCase();let answer=active==='quickmath'?String(state.nums[0]+state.nums[1]):active==='miniquiz'?'jupiter':active==='truefalse'?'true':active==='mastermind'?String(state.secret%4+1):state.word.toLowerCase();const correct=v===answer||(active==='hangman'&&state.word.toLowerCase().includes(v));state.scores[player]+=correct?1:0;state.log=[correct?'Correct! +1':'Not quite.'];state.round++;if(state.round>=5)state.winner=state.scores[0]===state.scores[1]?'draw':state.scores[0]>state.scores[1]?0:1;else state.turn=1-player;state.nums=[rand(10)+1,rand(10)+1];state.secret=rand(20)+1;state.word=['APPLE','GHOST','MANGO','TIGER','CLOUD','BRAIN','PEACH'][rand(7)];finishTurn()},!isTurn()||ended());prompt.append(inp,submit);area.appendChild(prompt)
+ }
+ if(state.log?.length)gameSay(`${state.log.join(' · ')} | You ${state.scores[player]} – ${state.scores[1-player]} Friend`);
+ else gameSay(`You ${state.scores[player]||0} · Friend ${state.scores[1-player]||0} · ${isTurn()?'Your turn':'Friend’s turn'}`)
+}
+function render(){
+ renderGames();const g=games.find(x=>x[0]===active);$('gameTitle').textContent=g?g[2]+' '+g[1]:'Choose a game';$('desc').textContent=g?g[3]:'Choose a game above.';$('gameArea').innerHTML='';if(!state)return;
+ if(ended()){gameSay(state.winner==='draw'?'It’s a draw!':`Player ${state.winner+1} wins!`,'good')}
+ if(['ttt','connect','gomoku','reversi'].includes(active)){
+  const cls={ttt:'tac',connect:'connect',gomoku:'gomoku',reversi:'reversi'}[active],b=board(cls);state.board.forEach((v,i)=>{const shown=active==='reversi'?(v==='X'?'●':v==='O'?'○':''):v;const x=btn(shown||' ',()=>playCell(i),!isTurn()||ended()||!!v,'cell');if(v==='X')x.style.color='var(--pink)';if(v==='O')x.style.color='var(--cyan)';b.appendChild(x)});if(active==='connect'){$('gameArea').querySelectorAll('button.cell').forEach((x,i)=>{x.onclick=()=>playCell(i%7);x.disabled=!isTurn()||ended()})}
+  if(active==='reversi')gameSay(`You ${state.board.filter(v=>v===(player===0?'X':'O')).length} · Friend ${state.board.filter(v=>v===(player===0?'O':'X')).length}`)
+ }else if(active==='dots')drawDots();
+ else if(active==='memory'){const b=board('memory');state.cards.forEach((v,i)=>{const show=state.revealed.includes(i)||state.matched.includes(i);const x=btn(show?v:'❔',()=>{if(!isTurn()||ended()||show)return;state.revealed.push(i);if(state.revealed.length===2){if(state.cards[state.revealed[0]]===state.cards[state.revealed[1]]){state.matched.push(...state.revealed);state.scores[player]++;state.revealed=[];if(state.matched.length===16)state.winner=state.scores[0]===state.scores[1]?'draw':state.scores[0]>state.scores[1]?0:1}else{state.turn=1-player;setTimeout(()=>{state.revealed=[];finishTurn()},850)}}finishTurn()},!connected||ended()||show,'cell');b.appendChild(x)});gameSay(`You ${state.scores[player]} · Friend ${state.scores[1-player]} · Find pairs!`)}
+ else if(active==='nim'){const b=board('');b.style.display='flex';b.style.justifyContent='center';b.style.flexWrap='wrap';for(let i=0;i<state.stones;i++){const s=document.createElement('span');s.textContent='🪨';s.style.fontSize='1.6rem';b.appendChild(s)}const a=document.createElement('div');a.className='actions';[1,2,3].forEach(n=>a.appendChild(btn('Take '+n,()=>{if(!isTurn()||state.stones<n)return;state.stones-=n;if(!state.stones)state.winner=player;else state.turn=1-player;finishTurn()},!isTurn()||ended()||state.stones<n)));$('gameArea').appendChild(a)}
+ else if(active==='rps'||active==='rpsls'){const box=document.createElement('div');box.className='actions';const opts=active==='rps'?['🪨 Rock','📄 Paper','✂️ Scissors']:['🪨 Rock','📄 Paper','✂️ Scissors','🦎 Lizard','🖖 Spock'];opts.forEach((o,i)=>box.appendChild(btn(o,()=>genericMove(i),!isTurn()||ended())));$('gameArea').appendChild(box)}
+ else renderDuel();
+ if(!connected)gameSay('Waiting for your friend to connect. Create a room and share the invite.')
+}
+renderGames();
+const qp=new URLSearchParams(location.search).get('peer');if(qp){$('peerId').value=qp;$('joinBox').classList.remove('hidden')}
+</script></body></html>
